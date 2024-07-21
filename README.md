@@ -1,52 +1,89 @@
-import random
-
-class Shop:
-    def __init__(self, player_money):
-        self.items = {
-            "Small Coin Pack": {"price": 100, "coins": 10},
-            "Medium Coin Pack": {"price": 450, "coins": 50},
-            "Large Coin Pack": {"price": 800, "coins": 100},
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMORPG Chiến Đấu</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #2c3e50;
         }
-        self.player_money = player_money
-        self.player_coins = 0
 
-    def display_items(self):
-        print("Welcome to the Coin Shop!")
-        for item, details in self.items.items():
-            print(f"{item}: {details['price']} money, gives {details['coins']} coins")
+        #game-container {
+            width: 800px;
+            height: 600px;
+            background-color: #ecf0f1;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #34495e;
+        }
 
-    def buy_item(self, item_name):
-        if item_name in self.items:
-            item = self.items[item_name]
-            if self.player_money >= item['price']:
-                self.player_money -= item['price']
-                self.player_coins += item['coins']
-                print(f"You bought {item_name} and received {item['coins']} coins!")
-            else:
-                print("You don't have enough money to buy this item.")
-        else:
-            print("This item does not exist in the shop.")
+        .character {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="player" class="character" style="top: 50%; left: 50%;"></div>
+        <div id="enemy" class="character" style="top: 20%; left: 20%; background-color: blue;"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const player = document.getElementById('player');
+            const enemy = document.getElementById('enemy');
+            const gameContainer = document.getElementById('game-container');
+            let playerHealth = 100;
+            let enemyHealth = 100;
 
-    def get_status(self):
-        print(f"Player Money: {self.player_money}")
-        print(f"Player Coins: {self.player_coins}")
+            document.addEventListener('keydown', function(event) {
+                let top = parseInt(player.style.top);
+                let left = parseInt(player.style.left);
 
-def main():
-    player_money = 1000
-    shop = Shop(player_money)
+                switch(event.key) {
+                    case 'ArrowUp':
+                        player.style.top = (top - 10) + 'px';
+                        break;
+                    case 'ArrowDown':
+                        player.style.top = (top + 10) + 'px';
+                        break;
+                    case 'ArrowLeft':
+                        player.style.left = (left - 10) + 'px';
+                        break;
+                    case 'ArrowRight':
+                        player.style.left = (left + 10) + 'px';
+                        break;
+                    case ' ':
+                        attack();
+                        break;
+                }
+            });
 
-    while True:
-        shop.display_items()
-        print("\nType the name of the item you want to buy or type 'exit' to leave the shop.")
-        choice = input("Your choice: ")
+            function attack() {
+                const playerRect = player.getBoundingClientRect();
+                const enemyRect = enemy.getBoundingClientRect();
 
-        if choice.lower() == 'exit':
-            break
-
-        shop.buy_item(choice)
-        shop.get_status()
-
-if __name__ == "__main__":
-    main()
-
-
+                if (playerRect.left < enemyRect.right &&
+                    playerRect.right > enemyRect.left &&
+                    playerRect.top < enemyRect.bottom &&
+                    playerRect.bottom > enemyRect.top) {
+                    enemyHealth -= 10;
+                    console.log(`Enemy Health: ${enemyHealth}`);
+                    if (enemyHealth <= 0) {
+                        enemy.remove();
+                        console.log('Enemy defeated!');
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
